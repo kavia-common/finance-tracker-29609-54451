@@ -1,15 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { fetchFinanceEntries } from "./api";
+import FinanceEntryList from "./FinanceEntryList";
 
 // PUBLIC_INTERFACE
 function App() {
   const [theme, setTheme] = useState('light');
+  const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState(null);
 
   // Effect to apply theme to document element
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
+
+  // Effect to fetch finance entries on mount
+  useEffect(() => {
+    async function loadEntries() {
+      setLoading(true);
+      setApiError(null);
+      try {
+        const data = await fetchFinanceEntries();
+        setEntries(data);
+      } catch (err) {
+        setApiError(err.message);
+        setEntries([]);
+      }
+      setLoading(false);
+    }
+    loadEntries();
+  }, []);
 
   // PUBLIC_INTERFACE
   const toggleTheme = () => {
@@ -28,19 +50,18 @@ function App() {
         </button>
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          <strong>Finance Tracker</strong>
         </p>
         <p>
           Current theme: <strong>{theme}</strong>
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <div style={{width: "100%", maxWidth: 700, margin: "24px auto 0 auto", textAlign: "left"}}>
+          {loading && <div>Loading entries...</div>}
+          {apiError && <div style={{ color: "#e02d1b" }}>Error loading entries: {apiError}</div>}
+          {!loading && !apiError && (
+            <FinanceEntryList entries={entries} />
+          )}
+        </div>
       </header>
     </div>
   );
