@@ -4,6 +4,9 @@ import './App.css';
 import { fetchFinanceEntries } from "./api";
 import FinanceEntryList from "./FinanceEntryList";
 
+// Domain logic imports (future: for entry creation/summary/validation)
+import { isValidEntry } from "./domain/entry";
+
 // PUBLIC_INTERFACE
 function App() {
   const [theme, setTheme] = useState('light');
@@ -23,7 +26,8 @@ function App() {
       setApiError(null);
       try {
         const data = await fetchFinanceEntries();
-        setEntries(data);
+        // If domain validation—filter out any invalid entries from backend
+        setEntries(Array.isArray(data) ? data.filter(isValidEntry) : []);
       } catch (err) {
         setApiError(err.message);
         setEntries([]);

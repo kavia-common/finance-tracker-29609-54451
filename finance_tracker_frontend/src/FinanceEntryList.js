@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { computeRunningTotal } from "./domain/summary";
 
 // PUBLIC_INTERFACE
 /**
@@ -8,7 +9,7 @@ import PropTypes from "prop-types";
  * @param {Array} props.entries - List of finance entries ({ id, description, amount, category, date })
  */
 function FinanceEntryList({ entries }) {
-  const runningTotal = entries.reduce((total, entry) => total + Number(entry.amount), 0);
+  const runningTotal = computeRunningTotal(entries);
 
   return (
     <div className="finance-list-container">
